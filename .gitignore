@@ -1,0 +1,6 @@
+go.sum
+main
+vendor/
+.env
+db/
+images/

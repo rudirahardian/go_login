@@ -1,0 +1,39 @@
+version: '2'
+services:
+    go-service:
+        build:
+            context: ./docker-config
+            dockerfile: go-extension
+        container_name: go-service
+        ports: 
+            - ${PORT}:${PORT}
+        networks:
+            go_nett:
+                ipv4_address: 4.2.1.2
+        volumes:
+            - '.:/app/:rw'
+        mem_limit: 300m
+    mysql_go:
+        env_file:
+            - .env
+        build:
+            context: ./docker-config
+            dockerfile: mysql-extension
+        container_name: mysql_go
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${password}
+            MYSQL_DATABASE: ${database}
+        volumes:
+            - ./db/:/var/lib/mysql
+        networks:
+            go_nett:
+                ipv4_address: 4.2.1.3
+            
+networks:
+    go_nett:
+        ipam:
+            driver: default
+            config: 
+                - subnet: 4.2.1.0/24

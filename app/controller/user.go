@@ -117,6 +117,23 @@ func V1UserRegister(c *gin.Context) {
 		})
 		return
 	}
+	user.Name = c.PostForm("name")
+	user.Username = c.PostForm("username")
+	user.Password = c.PostForm("password")
+	user.Foto = fileName
+
+	if err := service.InsertUser(user); err != nil{
+		c.JSON(http.StatusCreated, gin.H{"message": err, "data": user})
+
+		err := os.Remove(path)
+
+		if err != nil {
+			c.JSON(http.StatusCreated, gin.H{"message": err, "data": user})
+			return
+		}
+
+		return
+	}
 	
 	c.JSON(http.StatusCreated, gin.H{"message": "success", "data": user})
 }

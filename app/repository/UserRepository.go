@@ -58,7 +58,7 @@ func LoginQuery(username string, password string) ([]User,error) {
     return result, nil
 }
 
-func InsertQuery(user User){
+func InsertQuery(user User) error{
 	db, err := connect()
     if err != nil {
         fmt.Println(err)
@@ -71,4 +71,6 @@ func InsertQuery(user User){
 	}
 	
     defer rows.Close()
+
+    return err
 }

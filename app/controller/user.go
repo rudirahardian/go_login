@@ -7,7 +7,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/rudirahardian/go_env/app/repository"
 	"time"
-	// "fmt"
+	"strconv"
 )
 
 type Credential struct {
@@ -97,22 +97,37 @@ func V1UserRegister(c *gin.Context) {
 		return
 	}
 
-	path := "images/" + file.Filename
-	if err := c.SaveUploadedFile(file, path); err != nil {
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	fileName := strconv.FormatInt(expirationTime.Unix(),10) + file.Filename
+
+	if file.Header.Get("Content-Type") == "image/jpeg" || file.Header.Get("Content-Type") == "image/png"{
+		path := "images/" + fileName
+		if err := c.SaveUploadedFile(file, path); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  http.StatusBadRequest,
+				"message": err.Error(),
+			})
+			return
+		}
+	}else{
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
-			"message": err.Error(),
+			"message": "File now Allowed",
 		})
 		return
 	}
-
 	user.Name = c.PostForm("name")
 	user.Username = c.PostForm("username")
 	user.Password = c.PostForm("password")
-	user.Foto = file.Filename
+	user.Foto = fileName
 
-	service.InsertUser(user)
-	c.JSON(http.StatusCreated, gin.H{"message": "success", "data": user})
+	if err := service.InsertUser(user); err != nil{
+		c.JSON(http.StatusCreated, gin.H{"message": "success", "data": user})
+		return
+	}
+	
+	c.JSON(http.StatusCreated, gin.H{"message": "failed", "data": user})
 }
 
 func V1UserGet(c *gin.Context) {

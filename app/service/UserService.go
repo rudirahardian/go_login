@@ -13,8 +13,8 @@ func FindUser(username string, password string) ([]repository.User, error){
 	return repository.LoginQuery(username, password)
 }
 
-func InsertUser(user repository.User){
-	repository.InsertQuery(user)
+func InsertUser(user repository.User) error{
+	return repository.InsertQuery(user)
 }
 
 func ExtractClaims(tokenStr string) (*Claims, error) {

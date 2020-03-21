@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
-	dotenv := config.DotEnvVariable("PORT")
-	routes.RouteInit(dotenv)
+	PORT := config.DotEnvVariable("PORT")
+	MODE := config.DotEnvVariable("APP_ENV")
+	routes.RouteInit(PORT,MODE)
 }

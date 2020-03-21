@@ -6,9 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RouteInit(port string){
-	// gin.SetMode(gin.ReleaseMode)
-	gin.SetMode(gin.DebugMode)
+func RouteInit(port string, mode string){
+	gin.SetMode(mode)
 	router := gin.Default()
 	router.Use(middleware.PanicHandler)
 

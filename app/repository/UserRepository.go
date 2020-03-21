@@ -67,7 +67,9 @@ func InsertQuery(user User) error{
     rows, err := db.Query("insert into user (name, username, password, foto) values (?, ?, ?, ?)", user.Name, user.Username, user.Password, user.Foto)
 
 	if err != nil {
+        fmt.Printf("DB Error: ")
         fmt.Println(err)
+        return err
 	}
 	
     defer rows.Close()

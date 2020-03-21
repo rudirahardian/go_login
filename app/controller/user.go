@@ -149,7 +149,3 @@ func V1UserGet(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, result)
 }
-
-func V1UserUploadFoto(c *gin.Context){
-
-}

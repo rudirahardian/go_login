@@ -2,7 +2,6 @@ package repository
 
 import "database/sql"
 import _ "github.com/go-sql-driver/mysql"
-import "fmt"
 import helper "github.com/rudirahardian/go_env/config"
 
 type User struct {
@@ -14,7 +13,7 @@ type User struct {
 	Count int
 }
 
-func connect() (*sql.DB, error){
+func Connect() (*sql.DB, error){
 	db, err := sql.Open("mysql", helper.DotEnvVariable("user")+":"+helper.DotEnvVariable("password")+"@tcp("+helper.DotEnvVariable("DB_HOST")+":3306)/"+helper.DotEnvVariable("database"))
     if err != nil {
         return nil, err
@@ -24,7 +23,7 @@ func connect() (*sql.DB, error){
 }
 
 func LoginQuery(username string, password string) ([]User,error) {
-    db, err := connect()
+    db, err := Connect()
     if err != nil {
         return nil, err
     }
@@ -56,23 +55,4 @@ func LoginQuery(username string, password string) ([]User,error) {
 	
 	db.Close()
     return result, nil
-}
-
-func InsertQuery(user User) error{
-	db, err := connect()
-    if err != nil {
-        fmt.Println(err)
-    }
-
-    rows, err := db.Query("insert into user (name, username, password, foto) values (?, ?, ?, ?)", user.Name, user.Username, user.Password, user.Foto)
-
-	if err != nil {
-        fmt.Printf("DB Error: ")
-        fmt.Println(err)
-        return err
-	}
-	
-    defer rows.Close()
-
-    return err
 }

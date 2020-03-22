@@ -5,10 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rudirahardian/go_env/app/service"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/rudirahardian/go_env/app/repository"
 	"time"
-	"strconv"
-	"os"
 )
 
 type Credential struct {
@@ -78,60 +75,11 @@ func V1UserLogin(c *gin.Context) {
 }
 
 func V1UserRegister(c *gin.Context) {
-	var user repository.User
-	// var userForm UserForm
-	// err := c.Bind(&userForm)
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"status":  http.StatusBadRequest,
-	// 		"message": "can't bind struct",
-	// 	})
-	// 	return
-	// }
+	request := c
+	user, err := service.InsertUser(request);
 
-	file, err := c.FormFile("foto")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": "flle error",
-		})
-		return
-	}
-
-	expirationTime := time.Now().Add(5 * time.Minute)
-
-	fileName := strconv.FormatInt(expirationTime.Unix(),10) + file.Filename
-	path := "images/" + fileName
-	if file.Header.Get("Content-Type") == "image/jpeg" || file.Header.Get("Content-Type") == "image/png"{
-		if err := c.SaveUploadedFile(file, path); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  http.StatusBadRequest,
-				"message": err.Error(),
-			})
-			return
-		}
-	}else{
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": "File now Allowed",
-		})
-		return
-	}
-	user.Name = c.PostForm("name")
-	user.Username = c.PostForm("username")
-	user.Password = c.PostForm("password")
-	user.Foto = fileName
-
-	if err := service.InsertUser(user); err != nil{
+	if err != nil{
 		c.JSON(http.StatusCreated, gin.H{"message": err, "data": user})
-
-		err := os.Remove(path)
-
-		if err != nil {
-			c.JSON(http.StatusCreated, gin.H{"message": err, "data": user})
-			return
-		}
-
 		return
 	}
 	

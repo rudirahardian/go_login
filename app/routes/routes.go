@@ -9,7 +9,7 @@ import (
 func RouteInit(port string, mode string){
 	gin.SetMode(mode)
 	router := gin.Default()
-	// router.Use(middleware.PanicHandler)
+	router.Use(middleware.PanicHandler)
 
 	v1User := router.Group("/api/v1/user")
 	{

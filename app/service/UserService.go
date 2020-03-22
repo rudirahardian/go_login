@@ -54,7 +54,6 @@ func InsertUser(c *gin.Context) (models.Users, error){
 
 func ExtractClaims(tokenStr string) (*Claims, error) {
 	tknStr := tokenStr
-
 	claims := &Claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {

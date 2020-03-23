@@ -18,19 +18,18 @@ type Users struct {
 
 func (user *Users) InsertData() (string, error){
 	db, err := userRepository.Connect()
-		if err != nil {
-			fmt.Println(err)
-		}
+	if err != nil {
+		fmt.Println(err)
+	}
 	
-		rows, err := db.Query("insert into user (name, username, password, foto) values (?, ?, ?, ?)", user.Name, user.Username, user.Password, user.Foto)
-	
-		if err != nil {
-			fmt.Printf("DB Error: ")
-			fmt.Println(err)
-			return "error", err
-		}
+	_, err = db.Query("insert into user (name, username, password, foto) values (?, ?, ?, ?)", user.Name, user.Username, user.Password, user.Foto)	
+	if err != nil {
+		fmt.Printf("DB Error: ")
+		fmt.Println(err)
+		return "error", err
+	}
 		
-		defer rows.Close()
+	db.Close()
 	
-		return "success", err
+	return "success", err
 }

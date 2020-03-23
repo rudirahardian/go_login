@@ -29,21 +29,17 @@ func LoginQuery(username string, password string) ([]User,error) {
     }
 
     rows, err := db.Query("select id, name, username, password, count(*) as count from user where username = ? AND password = ? group by id ASC ", username, password)
-
 	if err != nil {
         return nil, err
 	}
-	
-    defer rows.Close()
 
     var result []User
 
     for rows.Next() {
         var each = User{}
         var err = rows.Scan(&each.Id, &each.Name, &each.Username, &each.Password, &each.Count)
-
         if err != nil {
-            return result, err
+            return nil, err
         }
 
         result = append(result, each)

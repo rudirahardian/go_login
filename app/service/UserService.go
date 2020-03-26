@@ -42,7 +42,8 @@ func InsertUser(c *gin.Context) (models.User, error){
 		Name: c.PostForm("name"),
 		Username: c.PostForm("username"),
 		Password: c.PostForm("password"),
-		Foto: fileName}
+		Foto: fileName,
+	}
 
 
 	if _, err := user.InsertData(); err != nil{

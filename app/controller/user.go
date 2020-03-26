@@ -79,7 +79,7 @@ func V1UserRegister(c *gin.Context) {
 	user, err := service.InsertUser(request);
 
 	if err != nil{
-		c.JSON(http.StatusCreated, gin.H{"message": err, "data": user})
+		c.JSON(400, gin.H{"message": err.Error(), "data": user})
 		return
 	}
 	

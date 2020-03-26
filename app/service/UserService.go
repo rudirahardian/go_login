@@ -7,6 +7,8 @@ import "time"
 import "os"
 import "strconv"
 import jwt "github.com/dgrijalva/jwt-go"
+import "sync"
+import "errors"
 
 type Claims struct {
 	Username string `json:"username"`
@@ -20,6 +22,8 @@ func FindUser(username string, password string) ([]repository.User, error){
 
 func InsertUser(c *gin.Context) (models.User, error){
 	var user models.User
+	var wg sync.WaitGroup
+	errChan := make(chan error)
 	
 	file, err := c.FormFile("foto")
 	if err != nil {
@@ -30,13 +34,22 @@ func InsertUser(c *gin.Context) (models.User, error){
 
 	fileName := strconv.FormatInt(expirationTime.Unix(),10) + file.Filename
 	path := "images/" + fileName
-	if file.Header.Get("Content-Type") == "image/jpeg" || file.Header.Get("Content-Type") == "image/png"{
-		if err := c.SaveUploadedFile(file, path); err != nil {
-			return nil, err
+
+	wg.Add(1)
+	go func(){
+		if file.Header.Get("Content-Type") == "image/jpeg" || file.Header.Get("Content-Type") == "image/png"{
+			if err := c.SaveUploadedFile(file, path); err != nil {
+				errChan <- err
+				return
+			}
+		}else{
+			errChan <- errors.New("Not Allowed Extension !!")
+			return
 		}
-	}else{
-		return nil, err
-	}
+		errChan <- nil		
+		return
+	}()
+	wg.Done()
 
 	user = &models.Users{
 		Name: c.PostForm("name"),
@@ -45,6 +58,12 @@ func InsertUser(c *gin.Context) (models.User, error){
 		Foto: fileName,
 	}
 
+	wg.Wait()
+	err = <-errChan
+	if err != nil {
+		return nil, err
+	}
+	close(errChan)
 
 	if _, err := user.InsertData(); err != nil{
 		err := os.Remove(path)

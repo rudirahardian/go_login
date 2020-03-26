@@ -18,11 +18,12 @@ func FindUser(username string, password string) ([]repository.User, error){
 	return repository.LoginQuery(username, password)
 }
 
-func InsertUser(c *gin.Context) (models.Users, error){
-	var user models.Users
+func InsertUser(c *gin.Context) (models.User, error){
+	var user models.User
+	
 	file, err := c.FormFile("foto")
 	if err != nil {
-		return user, err
+		return nil, err
 	}
 
 	expirationTime := time.Now().Add(5 * time.Minute)
@@ -31,15 +32,18 @@ func InsertUser(c *gin.Context) (models.Users, error){
 	path := "images/" + fileName
 	if file.Header.Get("Content-Type") == "image/jpeg" || file.Header.Get("Content-Type") == "image/png"{
 		if err := c.SaveUploadedFile(file, path); err != nil {
-			return user, err
+			return nil, err
 		}
 	}else{
-		return user, err
+		return nil, err
 	}
-	user.Name = c.PostForm("name")
-	user.Username = c.PostForm("username")
-	user.Password = c.PostForm("password")
-	user.Foto = fileName
+
+	user = &models.Users{
+		Name: c.PostForm("name"),
+		Username: c.PostForm("username"),
+		Password: c.PostForm("password"),
+		Foto: fileName}
+
 
 	if _, err := user.InsertData(); err != nil{
 		err := os.Remove(path)
